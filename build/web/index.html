@@ -11,6 +11,20 @@ and open the template in the editor.
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-        <div>Hello HTML</div>
+        <p>
+            Welcome to library management system
+        </p>
+        <a href="visitorHomePage.jsp">Visitor Home Page</a>
+        <br/>
+        <br/>
+        <form action="GreetingServletPath" method="POST">
+            Username : <input type="text" name="username" size="20"><br/>
+            Password : <input type="password" name="password" size="20">
+            <br/>
+            <br/>
+            <input type="submit" value="sign in">
+        </form>
+        <p>Not registered yet? Click<a href="addUser.jsp">here</a></p>
     </body>
+
 </html>

@@ -16,11 +16,12 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author pankaj
  */
-public class TestServlet extends HttpServlet {
+public class GreetingServletPath extends HttpServlet {
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    
+
     /**
-     * Handles the HTTP <code>GET</code> method.
+     * Handles the HTTP <code>POST</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -28,9 +29,22 @@ public class TestServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         PrintWriter writer = response.getWriter();
-        writer.write("<h1>Hello Servlet!!</h1>");
+        String username = String.valueOf(request.getParameter("username"));
+        String password = String.valueOf(request.getParameter("password"));
+        writer.println("Hello from POST "+username+" "+password);
     }
+
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
+
 }
