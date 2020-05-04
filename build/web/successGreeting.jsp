@@ -20,5 +20,7 @@
         <h3>
             Welcome <%=currentUser.getFirstName()%>
         </h3>
+        <br/>
+        <p>Click <a href="logoutServlet">here</a> to logout</p>
     </body>
 </html>

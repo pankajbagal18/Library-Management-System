@@ -4,9 +4,17 @@
         <servlet-name>GreetingServletPath</servlet-name>
         <servlet-class>com.devpanks.GreetingServletPath</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AddUserServlet</servlet-name>
+        <servlet-class>com.devpanks.AddUserServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>GreetingServletPath</servlet-name>
         <url-pattern>/GreetingServletPath</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddUserServlet</servlet-name>
+        <url-pattern>/AddUserServletPath</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
