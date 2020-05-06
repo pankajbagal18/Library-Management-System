@@ -5,6 +5,7 @@
  */
 package com.devpanks;
 
+import com.devpanks.datamodels.User;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -61,8 +62,10 @@ public class GreetingServletPath extends HttpServlet {
         else
         {
             request.setAttribute("CURRENT_USER", currentUser);
-            RequestDispatcher rd = request.getRequestDispatcher("successGreeting.jsp");
-            rd.forward(request, response);
+            if(currentUser.getUsername().equals("admin"))
+                request.getRequestDispatcher("adminSection.jsp").forward(request, response);
+            else
+                request.getRequestDispatcher("successGreeting.jsp").forward(request, response);
         }
     }
 
