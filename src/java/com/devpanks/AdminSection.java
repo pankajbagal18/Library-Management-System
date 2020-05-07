@@ -52,6 +52,7 @@ public class AdminSection extends HttpServlet {
                 else
                 {
                     request.setAttribute("listOfBooks", listOfBooks);
+                    request.setAttribute("BOOK_TYPE","AVAILABLE");
                     request.getRequestDispatcher("listBooks.jsp").forward(request, response);                    
                 }
                 break;

@@ -27,8 +27,9 @@
             }
             else
             {
+                String bookType = String.valueOf(request.getAttribute("BOOK_TYPE"));
                 %>
-                <p>List Of Books</p>
+                <p>List Of <%=bookType%> Books</p>
                 <%
                 for(Book book:listOfBooks)
                 {
