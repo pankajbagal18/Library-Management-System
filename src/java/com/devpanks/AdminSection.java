@@ -41,10 +41,11 @@ public class AdminSection extends HttpServlet {
             throws ServletException, IOException {
         String menuSelection = request.getParameter("menuselection");
         List<String> errorLogs = new ArrayList<>();
+        List<Book> listOfBooks = null;
         switch(menuSelection)
         {
             case "listBooks":
-                List<Book> listOfBooks = listBooks();
+                listOfBooks = listBooks();
                 if(listOfBooks==null||listOfBooks.isEmpty()==true)
                 {
                     errorLogs.add("Library is empty");
@@ -56,7 +57,19 @@ public class AdminSection extends HttpServlet {
                     request.getRequestDispatcher("listBooks.jsp").forward(request, response);                    
                 }
                 break;
+                
             case "listBorrowedBooks":
+                listOfBooks = listBorrowedBooks();
+                if(listOfBooks==null||listOfBooks.isEmpty()==true)
+                {
+                    errorLogs.add("No Book is borrowed.");
+                }
+                else
+                {
+                    request.setAttribute("listOfBooks", listOfBooks);
+                    request.setAttribute("BOOK_TYPE","BORROWED BOOKS");
+                    request.getRequestDispatcher("listBooks.jsp").forward(request, response);                    
+                }
                 break;
             default:
                 errorLogs.add("Select Proper Function");
@@ -107,6 +120,65 @@ public class AdminSection extends HttpServlet {
                     }
                 }
             }
+        }
+        return null;
+    }
+
+    // Implementation of this function can be different also.
+    // Purpose of this function is not defined yet.
+    private List<Book> listBorrowedBooks() {
+        Connection databaseConnection = MyConnection.getDatabaseConnection();
+        String query = "SELECT Books.Book_Id, Books.BookName,Books.Author,Books.ISBN,Books.AvailableCopies,Books.TotalCopies FROM Books INNER JOIN Checkout WHERE Books.Book_Id=Checkout.BookId GROUP BY Books.Book_Id";
+        if(databaseConnection!=null)
+        {
+            PreparedStatement pst = null;
+            try {   
+                pst = databaseConnection.prepareStatement(query);
+            } catch (SQLException ex) {
+                Logger.getLogger(AdminSection.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if(pst!=null)
+            {
+                ResultSet res = null;
+                try {
+                    res = pst.executeQuery();
+                } catch (SQLException ex) {
+                    Logger.getLogger(AdminSection.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if(res!=null)
+                {
+                    try {
+                        List<Book> listOfBooks = new ArrayList<>();
+                        while(res.next())
+                        {
+                            listOfBooks.add(new Book(
+                                    res.getInt(1),
+                                    res.getString(2),
+                                    res.getString(3),
+                                    res.getString(4),
+                                    res.getInt(5),
+                                    res.getInt(6)
+                                )
+                            );
+                        }
+                        return listOfBooks;
+                    } catch (SQLException ex) {
+                        Logger.getLogger(AdminSection.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                else
+                {
+                    System.out.println("Result Set is null");                
+                }
+            }
+            else
+            {
+                System.out.println("Prepered is null");
+            }
+        }
+        else
+        {
+            System.out.println("Connection is null");
         }
         return null;
     }
