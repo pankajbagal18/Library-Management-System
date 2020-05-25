@@ -6,6 +6,8 @@
 package com.devpanks;
 
 import com.devpanks.datamodels.Book;
+import com.devpanks.datamodels.Checkout;
+import com.mysql.cj.xdevapi.PreparableStatement;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -60,6 +62,7 @@ public class AdminSection extends HttpServlet {
                 
             case "listBorrowedBooks":
                 listOfBooks = listBorrowedBooks();
+                List<Checkout> dueBooks = listDueBooks();
                 if(listOfBooks==null||listOfBooks.isEmpty()==true)
                 {
                     errorLogs.add("No Book is borrowed.");
@@ -68,9 +71,11 @@ public class AdminSection extends HttpServlet {
                 {
                     request.setAttribute("listOfBooks", listOfBooks);
                     request.setAttribute("BOOK_TYPE","BORROWED BOOKS");
+                    request.setAttribute("dueBooks", dueBooks);
                     request.getRequestDispatcher("listBooks.jsp").forward(request, response);                    
                 }
                 break;
+
             default:
                 errorLogs.add("Select Proper Function");
                 break;
@@ -125,62 +130,90 @@ public class AdminSection extends HttpServlet {
     }
 
     // Implementation of this function can be different also.
-    // Purpose of this function is not defined yet.
-    private List<Book> listBorrowedBooks() {
-        Connection databaseConnection = MyConnection.getDatabaseConnection();
-        String query = "SELECT Books.Book_Id, Books.BookName,Books.Author,Books.ISBN,Books.AvailableCopies,Books.TotalCopies FROM Books INNER JOIN Checkout WHERE Books.Book_Id=Checkout.BookId GROUP BY Books.Book_Id";
-        if(databaseConnection!=null)
-        {
-            PreparedStatement pst = null;
-            try {   
-                pst = databaseConnection.prepareStatement(query);
-            } catch (SQLException ex) {
-                Logger.getLogger(AdminSection.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            if(pst!=null)
+    
+    private List<Book> listBorrowedBooks()  {
+        try (Connection databaseConnection = MyConnection.getDatabaseConnection()) {
+            String query = "SELECT Books.Book_Id, Books.BookName,Books.Author,Books.ISBN,Books.AvailableCopies,Books.TotalCopies FROM Books INNER JOIN Checkout WHERE Books.Book_Id=Checkout.BookId GROUP BY Books.Book_Id";
+            if(databaseConnection!=null)
             {
-                ResultSet res = null;
+                PreparedStatement pst = null;
                 try {
-                    res = pst.executeQuery();
+                    pst = databaseConnection.prepareStatement(query);
                 } catch (SQLException ex) {
                     Logger.getLogger(AdminSection.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                if(res!=null)
+                if(pst!=null)
                 {
+                    ResultSet res = null;
                     try {
-                        List<Book> listOfBooks = new ArrayList<>();
-                        while(res.next())
-                        {
-                            listOfBooks.add(new Book(
-                                    res.getInt(1),
-                                    res.getString(2),
-                                    res.getString(3),
-                                    res.getString(4),
-                                    res.getInt(5),
-                                    res.getInt(6)
-                                )
-                            );
-                        }
-                        return listOfBooks;
+                        res = pst.executeQuery();
                     } catch (SQLException ex) {
                         Logger.getLogger(AdminSection.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    if(res!=null)
+                    {
+                        try {
+                            List<Book> listOfBooks = new ArrayList<>();
+                            while(res.next())
+                            {
+                                listOfBooks.add(new Book(
+                                        res.getInt(1),
+                                        res.getString(2),
+                                        res.getString(3),
+                                        res.getString(4),
+                                        res.getInt(5),
+                                        res.getInt(6)
+                                )
+                                );
+                            }
+                            return listOfBooks;
+                        } catch (SQLException ex) {
+                            Logger.getLogger(AdminSection.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    else
+                    {
+                        System.out.println("Result Set is null");
                     }
                 }
                 else
                 {
-                    System.out.println("Result Set is null");                
+                    System.out.println("Prepered is null");                
                 }
             }
             else
             {
-                System.out.println("Prepered is null");
+                System.out.println("Connection is null");
             }
-        }
-        else
-        {
-            System.out.println("Connection is null");
+            databaseConnection.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(AdminSection.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
-
+    
+    private List<Checkout> listDueBooks()
+    {
+        Connection databaseConnection = MyConnection.getDatabaseConnection();
+        String query = "SELECT * FROM Checkout WHERE ReturnDate < now()";
+        
+        try {
+            PreparedStatement pst = databaseConnection.prepareStatement(query);
+            ResultSet res = pst.executeQuery();
+            List<Checkout> dueBooks = new ArrayList<Checkout>();
+            while(res.next())
+            {
+                dueBooks.add(new Checkout(
+                        res.getInt("TransactionId"),
+                        res.getInt("BookId"),
+                        res.getString("UserName"),
+                        res.getString("ReturnDate")
+                ));
+            }
+            return dueBooks;
+        } catch (SQLException ex) {
+            Logger.getLogger(AdminSection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
 }

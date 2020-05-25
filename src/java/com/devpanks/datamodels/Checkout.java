@@ -53,5 +53,10 @@ public class Checkout {
     public void setReturnDate(String returnDate) {
         this.returnDate = returnDate;
     }
+
+    @Override
+    public String toString() {
+        return "Checkout{" + "transactionId=" + transactionId + ", bookId=" + bookId + ", username=" + username + ", returnDate=" + returnDate + '}';
+    }
     
 }

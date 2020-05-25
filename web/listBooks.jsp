@@ -4,6 +4,7 @@
     Author     : pankaj
 --%>
 
+<%@page import="com.devpanks.datamodels.Checkout"%>
 <%@page import="com.devpanks.datamodels.Book"%>
 <%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -32,6 +33,24 @@
                 <p>List Of <%=bookType%> Books</p>
                 <%
                 for(Book book:listOfBooks)
+                {
+                %>
+                <p><%=book.toString()%></p>
+                <%
+                }
+            }
+        %>
+        <br/>
+        <br/>
+        <%
+            List<Checkout> dueBooks = (List<Checkout>)request.getAttribute("dueBooks");
+            if(dueBooks!=null&&!dueBooks.isEmpty())
+            {
+                String bookType = String.valueOf(request.getAttribute("BOOK_TYPE"));
+                %>
+                <p>List Of Due Books</p>
+                <%
+                for(Checkout book:dueBooks)
                 {
                 %>
                 <p><%=book.toString()%></p>
